@@ -5,15 +5,30 @@
 > מלאו את הקובץ הזה. הוא חלק מההערכה — קצר וברור עדיף על ארוך.
 
 ## 1. החלטות ארכיטקטוניות
-- ...
+-- מסד נתונים: SQLite
 
 ## 2. הבאג ביתרת החופשה
 - מה היה הבאג, איפה, ואיך תיקנתי:
+  הבאג: המשתנה `used` חושב אבל לא נעשה בו שימוש בתנאי.
+  איפה: LeaveRequestsController.cs, מתודת Create
+  תיקון: שיניתי את התנאי ל-(used + days) > employee.AnnualQuota
+  והוספתי ספירה של בקשות Pending בנוסף ל-Approved
+
 - הטסט שמוכיח את התיקון:
+  Create_ExceedsQuota_Fails ב-LeaveRequestsTests.cs
+    if (dto.Type == LeaveType.Vacation && (used + days) > employee.AnnualQuota)
+
+
 
 ## 3. אישור בקשה (approve) ו‑concurrency
 - איך טיפלתי במצבים לא חוקיים (כבר אושר / לא קיים):
+  בקשה לא קיימת → 404 Not Found
+  בקשה כבר אושרה/נדחתה → 400 Bad Request
+
 - מה לגבי אישור של שתי בקשות במקביל:
+  1. בדיקת מכסה ביצירת בקשה כוללת גם Pending - מונע יצירת בקשות שיחרגו
+  2. Transaction באישור + בדיקת מכסה נוספת לפני אישור (שימוש ב-used, שורה X במתודת Approve)
+  מגבלה: ב-SQLite אין נעילה ברמת השורה. ב-PostgreSQL אפשר FOR UPDATE להגנה מלאה
 
 ## 4. על מה ויתרתי בגלל הזמן
 - ... ומה הייתי עושה עם עוד יום:

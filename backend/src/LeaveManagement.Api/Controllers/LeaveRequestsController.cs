@@ -83,4 +83,43 @@ public class LeaveRequestsController : ControllerBase
 
         return Ok(request);
     }
+
+    // POST /api/leave-requests/{id}/approve
+    [HttpPost("{id}/approve")]
+    public IActionResult Approve(int id)
+    {
+        using var transaction = _db.Database.BeginTransaction();
+        var request = _db.LeaveRequests
+        .Include(r => r.Employee)
+        .Include(r => r.Employee).FirstOrDefault(r => r.Id == id);
+        if (request == null)
+            return NotFound("Leave request not found");
+        // בקשה כבר אושרה או נדחתה
+        if (request.Status != LeaveStatus.Pending)
+            return BadRequest("Request already processed");
+
+        // בדיקת מכסה (רק לחופשה)
+        if (request.Type == LeaveType.Vacation)
+        {
+            var used = _db.LeaveRequests
+                .Where(r => r.EmployeeId == request.EmployeeId
+                            && r.Type == LeaveType.Vacation
+                            && r.Status == LeaveStatus.Approved)
+                .Sum(r => r.Days);
+
+            if ((used + request.Days) > request.Employee!.AnnualQuota)
+            {
+                transaction.Rollback();
+                return BadRequest("Approval would exceed annual quota");
+            }
+        }
+
+        // אישור הבקשה
+        request.Status = LeaveStatus.Approved;
+        _db.SaveChanges();
+        transaction.Commit();
+
+        return Ok(request);
+    }
+
 }
