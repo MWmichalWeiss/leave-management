@@ -41,6 +41,8 @@
 
 <hr>
 
+<div *ngIf="message" [class]="message.type">{{ message.text }}</div>
+
 <div *ngIf="loading">Loading...</div>
 
 <table *ngIf="!loading">
@@ -66,7 +68,9 @@
             <td>{{ r.days }}</td>
             <td>{{ statusLabel(r.status) }}</td>
             <td>
-                <button *ngIf="r.status == 0" (click)="approve(r.id)">Approve</button>
+                <button *ngIf="r.status == 0" (click)="approve(r.id)" [disabled]="approvingId === r.id">
+                    {{ approvingId === r.id ? 'Approving...' : 'Approve' }}
+                </button>
             </td>
         </tr>
     </tbody>

@@ -1,11 +1,37 @@
 button {
-  background: #2680c2;
-  color: #fff;
-  border: none;
-  padding: 4px 12px;
-  border-radius: 4px;
+    background: #2680c2;
+    color: #fff;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
 }
 
-button:hover {
-  background: #186faf;
+    button:hover {
+        background: #186faf;
+    }
+
+    button:disabled {
+        background: #999;
+        cursor: not-allowed;
+    }
+
+.error {
+    color: #d32f2f;
+    font-size: 0.9em;
+    margin-left: 8px;
+}
+
+.success {
+    color: #388e3c;
+    padding: 8px;
+    margin: 8px 0;
+    background: #e8f5e9;
+    border-radius: 4px;
+}
+
+div.error {
+    padding: 8px;
+    margin: 8px 0;
+    background: #ffebee;
+    border-radius: 4px;
 }
